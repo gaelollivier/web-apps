@@ -1,0 +1,33 @@
+<form class="form-inline">
+	<div class="control-group pull-left">
+		<label for="promo">Promotion</label>
+		<select id="promo" ng-model="promo" ng-options="value as value for (key, value) in promos"></select>
+	</div>
+	<div class="control-group pull-left">
+		<label for="order">Order</label>
+		<select id="order" ng-model="order">
+			<option value="votes">Votes</option>
+			<option value="login">Login</option>
+			<option value="city">City</option>
+		</select>
+	</div>				
+	<div class="control-group pull-right">
+		<label for="filter">Filter</label>
+		<input id="filter" class="search-query" type="search" placeholder="Search" ng-model="filter">
+	</div>
+	<div class="clearfix"></div>
+</form>
+
+<div ng-show="images.length == 0" class="loader">
+	<img src="loader.gif" />
+</div>
+<ul class="images">
+	<li ng-repeat="image in images | filter:filter | orderBy:order:(order == 'votes')" class="span2">
+		<a rel="gallery" ng-href="http://perso.epitech.eu/~ol/work/raytracer/{{gallery}}/{{image.big}}" class="image">
+			<img class="img-polaroid" ng-src="http://perso.epitech.eu/~ol/work/raytracer/{{gallery}}/{{image.mini}}" alt="{{image.login}} ({{image.city}}) - {{image.votes}} votes">
+		</a>
+		<a href="https://intra.epitech.eu/user/{{image.login}}">{{image.login}}</a>
+		<span class="city">{{image.city}}</span>
+		<span>Votes: <strong>{{image.votes}}</strong></span>
+	</li>
+</ul>

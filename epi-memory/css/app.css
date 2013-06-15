@@ -1,0 +1,72 @@
+.login-form {
+	margin: 0px;
+}
+
+#student {
+	padding: 20px;
+	margin: auto;
+	/* Little trick to center an element without a fixed width :) */
+	display: table;
+	text-align: center;
+	border-radius: 5px;
+	background: -webkit-linear-gradient(#f5f5f5 0%, #fbfbfb 100%);
+	border: 1px solid #fff;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+#student > input {
+	display: block;
+	margin-top: 20px;
+}
+
+#score {
+	text-align: center;
+}
+
+#game-report {
+	margin-bottom: 20px;
+}
+
+#students-entered {
+	list-style-type: none;
+	margin: 0;	
+}
+
+#students-entered li {
+	padding: 10px 0px;
+	margin: 5px;
+	border-radius: 5px;
+	border: 1px solid #fff;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
+	/* Invalid state */
+	background: -webkit-linear-gradient(rgb(231, 136, 136) 0%, rgb(100, 44, 44) 100%);
+	color: white;
+}
+
+#students-entered li.valid {
+	background: -webkit-linear-gradient(#f5f5f5 0%, #fbfbfb 100%);
+	color: #000;
+}
+
+#students-entered li img {
+	width: 100px;
+	display: block;
+	margin: auto;
+}
+
+#students-entered li span {
+	display: block;
+	text-align: center;
+}
+
+#students-entered li span:first-of-type {
+	margin-top: 10px;
+}
+
+#students-entered li .login-entered {
+	color: #ee1818;
+}
+
+#students-entered li.valid .login-entered {
+	color: #21a606;
+}

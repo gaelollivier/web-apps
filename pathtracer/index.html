@@ -1,0 +1,454 @@
+<html>
+
+	<head>
+		<title>Pathtracer</title>
+		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+		
+		<!-- Styles -->
+		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="css/style.css">
+		
+		<!-- jQuery UI -->
+		<link rel="stylesheet" href="css/dark-hive/jquery.ui.min.css">
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script src="js/ui/jquery-ui.js"></script>
+		
+		<!-- Color Picker -->
+		<script type="text/javascript" src="js/farbtastic.js"></script>
+		<link rel="stylesheet" href="css/farbtastic.css" type="text/css" />
+				
+		<script type="text/javascript" src="js/stats.min.js"></script>		
+		<script type="text/javascript" src="js/gl-matrix-min.js"></script>
+		
+		<!-- Pathtracer -->
+		<script type="text/javascript" src="js/Utilities.js"></script>		
+		<script type="text/javascript" src="js/Scene.js"></script>
+		<script type="text/javascript" src="js/Renderer.js"></script>
+		<script type="text/javascript" src="js/Raytracing.js"></script>
+		<script type="text/javascript" src="js/Flycam.js"></script>
+		<script type="text/javascript" src="js/Pathtracer.js"></script>
+		<script type="text/javascript" src="js/Controls.js"></script>
+		
+	</head>
+	<body>
+		<section class="title">
+			<h1>WebGL Real-time pathtracer</h1>
+		</section>
+		<section id="content">
+			<div id="canvas-view"></div>
+		    
+			<section id="controls">
+			    <div class="accordion">
+			    	<h3>Scene</h3>
+					<div>
+						<label for="bg-color">Background color:</label>
+						<div id="bg-colorpicker" class="colorpicker"></div>				
+						<label for="exposure">Exposure:</label>
+						<div id="exposure" class="slider"></div>
+						<label for="exposure">Max paths length:</label>
+						<div id="max-path-length" class="slider"></div>
+						<span class="label">Render Lights:</span>
+						<div id="render-lights-switch">
+							<input type="radio" name="render-lights" id="render-lights-enabled" value="enabled" /><label for="render-lights-enabled">Enabled</label>
+							<input type="radio" name="render-lights" id="render-lights-disabled" value="disabled" /><label for="render-lights-disabled">Disabled</label>
+						</div>
+					</div>
+					<h3>Camera</h3>
+					<div>
+						<span class="label">Position:</span>
+						<div id="camera-position"></div>
+						<span class="label">Target:</span>
+						<div id="camera-target"></div>
+						<label for="camera-fov">Field of view:</label>
+						<div id="camera-fov" class="slider"></div>						
+						<label for="camera-aperture">Aperture:</label>
+						<div id="camera-aperture" class="slider"></div>
+						<label for="camera-focus">Focus distance:</label>
+						<input type="number" id="camera-focus" step="0.1" />
+					</div>										
+					<h3>Materials</h3>
+					<div>
+						Work in progress...
+					</div>
+					<h3>Objects</h3>
+					<div>
+						Work in progress...
+					</div>					
+					<h3>Lights</h3>
+					<div>
+						Work in progress...
+					</div>
+			    </div>
+			</section>
+			
+			<div id="view-stats"></div>			
+		    	
+    	
+    	<!-- Shaders -->
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec3	vertexPosition;
+			varying vec2	textureCoord;
+			uniform vec4	viewport;
+			
+			void main(void) {
+				textureCoord = vertexPosition.xy * 0.5 + 0.5;
+				textureCoord.x *= viewport.x/viewport.z;
+				textureCoord.y *= viewport.y/viewport.w;
+			    gl_Position = vec4(vertexPosition, 1.0);
+			}
+		</script>
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+
+			//
+			// Custom types
+			//
+			struct Ray {
+				vec3	origin;
+				vec3	direction;
+			};
+			
+			struct Material {
+				vec3	color;
+				float	diffuse;
+				float	specular;
+				float	reflection;
+				float	refraction;
+				float	shininess;
+				float	glossiness;
+			};
+			
+			struct Object {
+				int			type;
+				vec3		position;
+				Material	material;
+				vec3		datas;
+			};
+			
+			struct Light {
+				vec3	position;
+				vec3	color;
+				float	radius;
+			};
+			
+			struct Camera {
+				vec3	position;
+				vec3	target;
+				vec2	size;
+				vec3	upVector;
+				float	nearClippingPlane;
+				float	fovy;
+				float	aperture;
+				float	focusDistance;
+			};
+			
+			// Constants
+			const float NO_INTERSECT = -1.0;
+			const float PI = 3.14159265359;
+			const float EPSILON = 0.0001;
+			
+			// Object types
+			const int LIGHT = 0;
+			const int SPHERE = 1;
+			const int PLANE = 2;
+			const int CUBE = 3;
+
+			//
+			// Uniforms
+			//
+			uniform sampler2D	texture;
+			varying vec2		textureCoord;
+			uniform	float		sampleWeight;
+			
+			// General configuration
+			uniform vec4	viewport;
+			uniform float	time;
+			
+			// Scene
+			uniform Camera	camera;
+			uniform vec3	backgroundColor;
+			uniform float	exposure;
+			
+			const int 		NB_OBJECTS = {NB_OBJECTS};
+			const int		NB_LIGHTS = {NB_LIGHTS};
+			uniform Object	objects[NB_OBJECTS];
+			uniform Light	lights[NB_LIGHTS];
+			
+			//
+			// Random generators, from http://madebyevan.com/webgl-path-tracing/webgl-path-tracing.js
+			//
+			float random(in vec3 scale, in float seed) {
+				return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);
+			}
+
+			// Random cosine-weighted distributed vector
+			// from http://www.rorydriscoll.com/2009/01/07/better-sampling/
+			vec3 cosineWeightedDirection(in float seed, in vec3 normal) {
+				float u = random(vec3(12.9898, 78.233, 151.7182), seed);
+				float v = random(vec3(63.7264, 10.873, 623.6736), seed);
+				float r = sqrt(u);
+				float angle = 6.283185307179586 * v;
+				// compute basis from normal
+				vec3 sdir, tdir;
+				if (abs(normal.x) < .5) {
+					sdir = cross(normal, vec3(1,0,0));
+				} else {
+					sdir = cross(normal, vec3(0,1,0));
+				}
+				tdir = cross(normal, sdir);
+				return r*cos(angle)*sdir + r*sin(angle)*tdir + sqrt(1.-u)*normal;
+			}
+
+			// random normalized vector
+			vec3 uniformlyRandomDirection(in float seed) {
+				float u = random(vec3(12.9898, 78.233, 151.7182), seed);
+				float v = random(vec3(63.7264, 10.873, 623.6736), seed);
+				float z = 1.0 - 2.0 * u;
+				float r = sqrt(1.0 - z * z);
+				float angle = 6.283185307179586 * v;
+				return vec3(r * cos(angle), r * sin(angle), z);
+			}
+
+			// random vector in the unit sphere
+			vec3 uniformlyRandomVector(float seed) {
+				return uniformlyRandomDirection(seed) * sqrt(random(vec3(36.7539, 50.3658, 306.2759), seed));
+			}
+			
+			// Return a view ray of the camera
+			// From http://schabby.de/picking-opengl-ray-tracing/
+			Ray getCameraRay(in vec2 point) {	
+				Ray cameraRay;
+				
+				// Randomize pixel point for antialiasing
+				point += vec2(random(vec3(0.123, 0.4242, 0.8448), time), random(vec3(0.4578, 0.139, 0.692), time)) / viewport.xy;
+				
+				vec3 view = normalize(camera.target - camera.position);
+				vec3 h = normalize(cross(view, camera.upVector));
+				vec3 v = normalize(cross(h, view));
+	
+				float rad = camera.fovy * PI / 180.0;
+				float vLength = tan(rad / 2.0) * camera.nearClippingPlane;
+				float hLength = vLength * (camera.size.x / camera.size.y);
+	
+				h *= hLength;
+				v *= vLength;
+	
+				vec2 screenSpace = 2.0 * point - 1.0;
+
+				vec3 pos = camera.position + view * camera.nearClippingPlane + h * screenSpace.x + v * screenSpace.y;
+				vec3 dir = normalize(pos - camera.position);
+					
+				cameraRay.origin = camera.position;
+				cameraRay.direction = dir;
+				
+				if (camera.aperture > 0.0) {
+					// Add depth of fielf :)
+					vec3 focusPoint = camera.position + dir * camera.focusDistance;
+					cameraRay.origin = cameraRay.origin + uniformlyRandomDirection(time + dot(point,point)) * camera.aperture;
+					cameraRay.direction = normalize(focusPoint - cameraRay.origin);
+				}
+								
+				return cameraRay;
+			}
+			
+			float intersectWithSphere(in Ray ray, in vec3 position, in float radius) {
+			    // From http://en.wikipedia.org/wiki/Line–sphere_intersection
+			    vec3 oc = ray.origin - position;
+			    float a = dot(ray.direction, ray.direction);
+			    float b = 2.0 * dot(ray.direction, oc);
+			    float c = dot(oc, oc) - radius * radius;
+			    float delta = b*b - 4.0*a*c;
+			    if (delta > 0.0) {
+			        float d = (-b - sqrt(delta)) / (2.0*a);
+			        if (d > 0.0)
+			            return d;
+			    }
+			    return NO_INTERSECT;	
+			}
+			
+			float intersectWithPlane(in Ray ray, in vec3 position, in vec3 normal) {
+			    // From http://en.wikipedia.org/wiki/Line-plane_intersection
+			    float denom = dot(ray.direction, normal);
+			    if (denom != 0.0) {
+			        return dot((position - ray.origin), normal) / denom;
+			    }
+			    return NO_INTERSECT;
+			}
+			
+			float intersectWithCube(in Ray ray, in vec3 pmin, in vec3 pmax) {
+				// From http://madebyevan.com/webgl-path-tracing/webgl-path-tracing.js			
+				vec3 tMin = (pmin - ray.origin) / ray.direction;
+				vec3 tMax = (pmax - ray.origin) / ray.direction;
+				vec3 t1 = min(tMin, tMax);
+				vec3 t2 = max(tMin, tMax);
+				float tNear = max(max(t1.x, t1.y), t1.z);
+				float tFar = min(min(t2.x, t2.y), t2.z);
+				if (tNear > tFar)
+					return -1.0;
+				return tNear;
+			}
+			
+			void intersectWithObject(in Ray ray, in Object object, inout float kMin, inout Object intersectedObject) {
+				float k = NO_INTERSECT;
+				
+				if (object.type == SPHERE || object.type == LIGHT)
+					k = intersectWithSphere(ray, object.position, object.datas.x);
+				else if (object.type == PLANE)
+					k = intersectWithPlane(ray, object.position, object.datas);
+				else if (object.type == CUBE)
+					k = intersectWithCube(ray, object.position, object.datas);
+					
+				if (k != NO_INTERSECT && k > EPSILON && (kMin == NO_INTERSECT || k < kMin)) {
+					kMin = k;
+					intersectedObject = object;
+				}
+			}
+			
+			vec3 getNormalAtPoint(in Object object, in vec3 intersectPoint) {
+				if (object.type == SPHERE) {
+					return normalize(intersectPoint - object.position);
+				} else if (object.type == PLANE) {
+					return object.datas;
+				} else if (object.type == CUBE) {
+					if (intersectPoint.x < object.position.x + EPSILON) return vec3(-1.0, 0.0, 0.0);
+				    else if(intersectPoint.x > object.datas.x - EPSILON) return vec3(1.0, 0.0, 0.0);
+				    else if(intersectPoint.y < object.position.y + EPSILON) return vec3(0.0, -1.0, 0.0);
+				    else if(intersectPoint.y > object.datas.y - EPSILON) return vec3(0.0, 1.0, 0.0);
+				    else if(intersectPoint.z < object.position.z + EPSILON) return vec3(0.0, 0.0, -1.0);
+				    else return vec3(0.0, 0.0, 1.0);
+				}
+				return vec3(0.0, 0.0, 0.0);
+			}
+			
+			float intersectWithObjects(in Ray ray, inout Object intersectedObject) {
+				float kMin = NO_INTERSECT;
+				
+				{INTERSECT_WITH_OBJECTS}
+				// intersectWithObject(ray, objects[0], kMin, intersectedObject);...
+				
+				return kMin;
+			}
+			
+			bool castShadowWithObject(in Ray ray, in Object object, in float maxDist) {
+				float k = NO_INTERSECT;
+				
+				if (object.type == SPHERE)
+					k = intersectWithSphere(ray, object.position, object.datas.x);
+				else if (object.type == PLANE)
+					k = intersectWithPlane(ray, object.position, object.datas);
+				else if (object.type == CUBE)
+					k = intersectWithCube(ray, object.position, object.datas);
+					
+				if (k != NO_INTERSECT && k > EPSILON && k < maxDist) {
+					return true;
+				}
+				return false;
+			}			
+			
+			bool castShadow(in Ray ray, float maxDist) {
+			
+				{CAST_SHADOW}
+				// if (castShadowWithObject(ray, objects[0], maxDist)) return true;...
+				
+				return false;				
+			}
+			
+			vec3 calcDirectLightingForLight(in Ray ray, in Light light, in Object object, in vec3 intersectPoint, in vec3 normal) {
+				if (object.type == LIGHT)
+					return object.material.color;
+				vec3 directLighting = vec3(0.0, 0.0, 0.0);				
+				vec3 lightPosition = light.position;
+				lightPosition += uniformlyRandomVector(time + dot(normal, lightPosition)) * light.radius;
+				Ray lightRay;				
+				lightRay.origin = intersectPoint;
+				lightRay.direction = lightPosition - intersectPoint;
+				float distance = length(lightRay.direction);
+				lightRay.direction = normalize(lightRay.direction);
+				
+				if (!castShadow(lightRay, distance)) {
+				
+					// Diffuse light
+					float diffuseCoeff = max(0.0, dot(normal, lightRay.direction));	
+					directLighting += object.material.color * light.color * diffuseCoeff * object.material.diffuse;
+					
+					// Specular light
+					vec3 reflected = normalize(reflect(lightRay.direction, normal));
+		    		float specCosAlpha = dot(normalize(ray.direction), reflected);
+		    		float specCoeff = pow(specCosAlpha, object.material.shininess) * diffuseCoeff * object.material.specular;
+		    		if (specCoeff > 0.0) {
+			    		directLighting += light.color * specCoeff;
+			    	}
+					
+				}
+				
+				return directLighting;
+			}
+			
+			vec3 calcDirectLighting(in Ray ray, in Object object, in vec3 intersectPoint, in vec3 normal) {
+				vec3 directLighting = vec3(0.0, 0.0, 0.0);
+				
+				{CALC_DIRECT_LIGHTING}
+				// directLighting += calcDirectLightingForLight(ray, lights[0], object, intersectPoint, normal);...
+				
+				return directLighting;
+			}
+			
+			void getBRDFRay(inout Ray ray, in Object intersectedObject, in vec3 intersectPoint, in vec3 normal) {
+				ray.origin = intersectPoint;
+				if (intersectedObject.material.reflection > 0.0) {
+					ray.direction = normalize(reflect(ray.direction, normal) 
+									+ uniformlyRandomVector(time + dot(normal, intersectPoint)) * intersectedObject.material.glossiness);		
+				} else if (intersectedObject.material.refraction > 0.0) {
+					ray.direction = normalize(refract(ray.direction, normal, intersectedObject.material.refraction));
+				} else {
+					ray.direction = cosineWeightedDirection(time + dot(normal, intersectPoint), normal);
+				}				
+			}
+			
+			vec3 traceRay(in Ray ray) {
+				vec3 finalColor = vec3(0.0, 0.0, 0.0);
+				vec3 weight = vec3(1.0, 1.0, 1.0);
+				
+				for (int i = 0; i < {MAX_PATH_LENGTH}; ++i) {
+					Object intersectedObject;
+					float k = intersectWithObjects(ray, intersectedObject);
+					
+					if (k == NO_INTERSECT) {
+						finalColor += weight * backgroundColor;
+						return finalColor;
+					}
+					
+					// Get intersect point and normal
+					vec3 intersectPoint = ray.origin + ray.direction * k;
+					vec3 normal = getNormalAtPoint(intersectedObject, intersectPoint);
+					
+					// Direct light
+					vec3 directLighting = calcDirectLighting(ray, intersectedObject, intersectPoint, normal);
+					
+					// Prepare ray for indirect light
+					getBRDFRay(ray, intersectedObject, intersectPoint, normal);
+					
+					// Add light
+					finalColor += weight * directLighting;
+					weight *= intersectedObject.material.color;
+				}
+				
+				return finalColor;
+			}
+			
+			vec3 tracePixel(vec2 point) {
+				vec3 finalColor = traceRay(getCameraRay(point));
+				
+				// Exposure
+				finalColor = vec3(1.0, 1.0, 1.0) - exp(finalColor * -exposure);
+				
+				return finalColor;
+			}
+
+			void main(void) {			
+				vec3 finalColor = tracePixel(vec2(gl_FragCoord.xy / viewport.xy));
+				gl_FragColor = vec4(mix(finalColor, texture2D(texture, textureCoord).rgb, sampleWeight), 1.0);
+			}
+		</script>
+    </body>
+</html>

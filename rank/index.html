@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html ng-app="EpitechRanking">
+	<head>
+		<meta charset="utf-8">
+		<title>EPITECH Ranking v4.2</title>
+		
+		<meta name="description" content="A simple EPITECH student's ranking based on their GPA">
+		<meta name="author" content="Gael Jochaud du Plessix">
+		
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+		
+		<style type="text/css">
+		
+			body {
+				padding-top: 20px !important;
+			}
+					
+            #scrollUp {
+            	bottom: 20px;
+            	right: 20px;
+            	height: 38px;  /* Height of image */
+            	width: 38px; /* Width of image */
+            	background: url(top.png) no-repeat;
+            	font-size: 0px;
+            }		
+		
+			form {
+				margin: 10px 0px;
+			}
+		
+			table {
+				width: 100%;				
+			}
+			
+			th.gpa {
+				width: 50%;
+			}
+			
+			.table th, .table td {
+				text-align: center;
+			}
+			
+			.table th a {
+				cursor: pointer;
+			}
+			
+			.table .progress {
+				margin-bottom: 0px;
+			}
+			
+			.city {
+				cursor: pointer;
+			}
+
+		</style>
+		
+	</head>	
+	<body ng-controller="EpitechRankingController">		
+		
+		<div class="container">
+		
+		<div class="hero-unit">
+			<h1>EPITECH Ranking</h1>
+			<p>v4.2</p>
+		</div>
+
+		<div ng-show="authenticated">
+			<form class="form-inline">
+				<div class="control-group pull-left">
+					<label for="promo">Promotion</label>
+					<select id="promo" ng-model="promo" ng-options="value as value for (index, value) in promos"></select>
+				</div>
+				<div class="control-group pull-right">
+					<label for="filter">Filter</label>
+					<input id="filter" class="search-query" type="search" placeholder="Search" ng-model="search">
+				</div>
+				<div class="clearfix"></div>
+			</form>
+			<table class="table table-bordered table-striped table-hover" infinite-scroll="loadMore()">
+				<caption>Ranking - Promotion {{promo}}</caption>
+				<thead>
+					<tr>
+						<th class="rank"><a ng-click="orderBy('rank')"><i ng-class="{'rank-false': 'icon-chevron-down', 'rank-true': 'icon-chevron-up'}[order.join('-')]"></i> #Rank</a></th>
+						<th class="login"><a ng-click="orderBy('login')"><i ng-class="{'login-false': 'icon-chevron-down', 'login-true': 'icon-chevron-up'}[order.join('-')]"></i> Login</a></th>
+						<th class="login"><a ng-click="orderBy('city')"><i ng-class="{'city-false': 'icon-chevron-down', 'city-true': 'icon-chevron-up'}[order.join('-')]"></i> City</a></th>
+						<th class="gpa"><a ng-click="orderBy('gpa')"><i ng-class="{'gpa-false': 'icon-chevron-down', 'gpa-true': 'icon-chevron-up'}[order.join('-')]"></i> GPA</a></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="student in students | filter:search | orderBy:order[0]:order[1] | limitTo:tableSize">
+						<td>{{student.rank}}</td>
+						<td><a href="https://intra.epitech.eu/user/{{student.login}}" title="See profile of {{student.login}}">{{student.login}}</a></td>
+						<td><span class="city" ng-click="$parent.search = student.city">{{student.city}}</span></td>
+						<td>
+							<div class="progress" ng-show="student.gpa > 0.5">
+								<div class="bar" ng-style="{width: (student.gpa*100/4)+'%'}">{{student.gpa}}</div>
+							</div>
+							<span ng-show="student.gpa <= 0.5">{{student.gpa}}</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div ng-show="!authenticated">
+			<form ng-submit="authenticate()">
+				<h2>You must be logged to access this service</h2>
+				<div class="control-group">
+					<label class="control-label" for="login">Login</label>
+					<div class="controls">
+						<input id="login" type="text" placeholder="Login" ng-model="form.login" required>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="password">Password (unix)</label>
+					<div class="controls">
+						<input id="password" type="password" placeholder="Password" ng-model="form.password" required>
+					</div>
+				</div>
+				<button class="btn btn-primary">Authenticate</button>
+			</form>
+		</div>
+		
+		</div> <!-- /container -->				
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>		
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular-cookies.min.js"></script>
+
+
+		<!-- A few libs directly included here... the original goal was to make a one-file app :) -->
+		<script type="text/javascript">
+/* ng-infinite-scroll - v1.0.0 - 2013-02-23 */
+var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",["$rootScope","$window","$timeout",function(i,n,e){return{link:function(t,l,o){var r,c,f,a;return n=angular.element(n),f=0,null!=o.infiniteScrollDistance&&t.$watch(o.infiniteScrollDistance,function(i){return f=parseInt(i,10)}),a=!0,r=!1,null!=o.infiniteScrollDisabled&&t.$watch(o.infiniteScrollDisabled,function(i){return a=!i,a&&r?(r=!1,c()):void 0}),c=function(){var e,c,u,d;return d=n.height()+n.scrollTop(),e=l.offset().top+l.height(),c=e-d,u=n.height()*f>=c,u&&a?i.$$phase?t.$eval(o.infiniteScroll):t.$apply(o.infiniteScroll):u?r=!0:void 0},n.on("scroll",c),t.$on("$destroy",function(){return n.off("scroll",c)}),e(function(){return o.infiniteScrollImmediateCheck?t.$eval(o.infiniteScrollImmediateCheck)?c():void 0:c()},0)}}}])		</script>
+
+        <script type="text/javascript">
+/*
+scrollUp v1.1.0
+Author: Mark Goodyear - http://www.markgoodyear.com
+Git: https://github.com/markgoodyear/scrollup
+Copyright 2013 Mark Goodyear
+Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+*/
+
+;(function(e){e.scrollUp=function(t){var n={scrollName:"scrollUp",topDistance:300,topSpeed:300,animation:"fade",animationInSpeed:200,animationOutSpeed:200,scrollText:"Scroll to top",scrollImg:false,activeOverlay:false};var r=e.extend({},n,t),i="#"+r.scrollName;e("<a/>",{id:r.scrollName,href:"#top",title:r.scrollText}).appendTo("body");if(!r.scrollImg){e(i).text(r.scrollText)}e(i).css({display:"none",position:"fixed","z-index":"2147483647"});if(r.activeOverlay){e("body").append("<div id='"+r.scrollName+"-active'></div>");e(i+"-active").css({position:"absolute",top:r.topDistance+"px",width:"100%","border-top":"1px dotted "+r.activeOverlay,"z-index":"2147483647"})}e(window).scroll(function(){switch(r.animation){case"fade":e(e(window).scrollTop()>r.topDistance?e(i).fadeIn(r.animationInSpeed):e(i).fadeOut(r.animationOutSpeed));break;case"slide":e(e(window).scrollTop()>r.topDistance?e(i).slideDown(r.animationInSpeed):e(i).slideUp(r.animationOutSpeed));break;default:e(e(window).scrollTop()>r.topDistance?e(i).show(0):e(i).hide(0))}});e(i).click(function(t){e("html, body").animate({scrollTop:0},r.topSpeed);t.preventDefault()})}})(jQuery);
+        </script>
+        
+        <script type="text/javascript" src="../epitech/service.js"></script>
+		
+		<script type="text/javascript">
+			$(function(){
+			  $.scrollUp();
+			});		
+
+			angular.module('EpitechRanking', ['epitech', 'infinite-scroll']).
+				controller('EpitechRankingController', function($scope, epitech) {
+				
+					// Very basic authentification...
+					$scope.authenticated = false;
+					
+					epitech.onAuthenticate = function(auth) {
+						$scope.authenticated = auth;
+						if (!auth) {
+							if ($scope.form) {
+								alert('Invalid identifiers');
+							} else {
+								alert('You must authenticate to access this service');
+							}
+						}
+					};
+					
+					$scope.authenticate = function() {
+						epitech.login($scope.form.login, $scope.form.password);
+					};
+				
+					$scope.promos = ['2017', '2016', '2015', '2014', '2013'];
+					var cities = {
+						'PAR' : 'Paris',
+						'TLS' : 'Toulouse',
+						'NAN' : 'Nantes',
+						'LYN' : 'Lyon',
+						'LIL' : 'Lille',
+						'NCE' : 'Nice',
+						'BDX' : 'Bordeaux',
+						'MAR' : 'Marseille',
+						'STG' : 'Strasbourg',
+						'NCY' : 'Nancy',
+						'MPL' : 'Montpellier',
+						'REN' : 'Rennes'
+					};
+				
+					$scope.users = [];
+					$scope.promo = undefined;
+					
+                    $scope.tableSize = 100;
+					
+					var order = $scope.order = ['rank', false]; // Property / Reverse
+					
+					$scope.orderBy = function(property) {
+						if (order[0] == property) {
+							order[1] = !order[1];
+						} else {
+							order[0] = property;
+							order[1] = false;
+						}
+					}
+					
+					$scope.loadMore = function() {
+						$scope.tableSize += 100;
+					}
+					
+					var fetchData = function() {
+						if (!$scope.promo || !$scope.authenticated)
+							return ;
+						epitech.studentsGPA($scope.promo).then(function(students) {
+							if (!angular.isArray(students))
+								return ;
+							students.sort(function(a, b) { return b.gpa - a.gpa; });
+							var rank = 1;
+							$scope.students = [];
+							$scope.tableSize = 100; // Reset table size
+							for (var i = 0; i < students.length; ++i) {
+								if (students[i].gpa !== undefined) {
+									students[i].rank = rank++;
+									var location = students[i].location.split('/');
+									students[i].city = cities[location[1]];
+									$scope.students.push(students[i]);
+								}
+							}
+						});
+					};
+
+					$scope.$watch('promo', function(promo) {
+						fetchData();
+					});
+					
+					$scope.$watch('authenticated', function(auth) {
+						fetchData();
+					});
+				});
+		</script>		
+		
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-36533977-1']);
+		  _gaq.push(['_trackPageview']);
+		
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		
+		</script>		
+				
+	</body>
+
+</html>

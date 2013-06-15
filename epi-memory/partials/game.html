@@ -1,0 +1,59 @@
+<form ng-show="gameForm">
+	<h1>Jeu</h1>
+	<fieldset>	
+		<legend>Promo</legend>
+		<label for="promo">Sélectionner la promotion avec laquelle jouer:</label>
+		<select id="promo" ng-model="promo" ng-options="key as value for (key, value) in promos"></select>
+	</fieldset>
+	<fieldset ng-show="cities.length > 0">
+		<legend>Ville</legend>
+		<label for="city">Sélectionner une ville:</label>
+		<select id="city" ng-model="city" ng-options="value as citiesNames[value] for value in cities"></select>
+	</fieldset>
+	<div  ng-show="students.length > 0">
+		<h2>Et c'est tout ! Prêt à commencer avec {{students.length}} étudiant{{students.length != 1 && 's' || ''}} !</h2>
+		<p>
+			Le jeu est simple: vous avez {{totalTime}} secondes pour associer un maximum de photos d'étudiants à leur login ! Les étudiants sont choisis aléatoirement et réapparaîtront si vous vous trompez. Bonne chance !
+		</p>
+		<div ng-show="!ready"><progress value="loadingProgress" class="progress-striped active"></progress></div>		
+		<button ng-enabled="ready" class="btn btn-primary" ng-click="beginGame()">{{ready && 'C\'est parti!' || 'Chargement des photos...'}}</button>
+	</div>
+</form>
+
+<div ng-show="gameBegan">
+	<label>Temps restant</label>
+	<!-- Can't use the angular ui directive because it doesn't allow to insert text in the bar -->
+	<div class="progress progress-striped active">
+		<div class="bar" ng-style="{width: (remainingTime / totalTime * 100)+'%'}">
+			<div ng-show="remainingTime > 0.9">{{remainingTime | number:0}} <span ng-show="(remainingTime / totalTime) > 0.1">seconde{{remainingTime > 1 && 's' || ''}}</span></div>
+		</div>
+	</div>
+	
+	<form id="student" ng-submit="loginEntered()">
+		<img ng-src="{{currentStudent.photo.src}}" alt="Photo" class="img-polaroid">
+		<input type="text" ng-model="inputLogin" placeholder="login..." />
+	</form>	
+	<h3 id="score">Score: {{score}}</h3>
+</div>
+
+<div ng-show="gameReport" id="game-report">
+	<h3>
+		<span ng-show="scoreEvaluation <= 0.1">Boulet... Tu as vraiment des progrès à faire !</span>
+		<span ng-show="scoreEvaluation > 0.1 && scoreEvaluation <= 0.4">Pas terrible !</span>
+		<span ng-show="scoreEvaluation > 0.4 && scoreEvaluation <= 0.6">Pas mal !</span>
+		<span ng-show="scoreEvaluation > 0.6 && scoreEvaluation <= 0.8">Super !</span>
+		<span ng-show="scoreEvaluation > 0.8">Wow ! Excellent !</span>
+	</h3>
+	<p>
+		Tu as trouvé {{validStudents}} login{{validStudents != 1 && 's' || ''}} !
+	</p>
+	<h3>Score: {{score}}</h3>
+	<ul id="students-entered">
+		<li ng-repeat="studentEntered in studentsEntered" ng-class="{span3:true, valid: studentEntered.login == studentEntered.student.login}">
+			<img ng-src="{{studentEntered.student.photo.src}}" alt="{{studentEntered.student.login}}" class="img-polaroid" />
+			<span>Login: <strong>{{studentEntered.student.login}}</strong></span>
+			<span>Login entré: <strong class="login-entered">{{studentEntered.login}}</strong></span>
+		</li>
+	</ul>
+	<div class="clearfix"></div>
+</div>

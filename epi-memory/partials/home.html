@@ -1,0 +1,42 @@
+<h1>EPI Memory</h1>
+<p>
+	EPI Memory est un jeu qui permet de mémoriser le visage des étudiants à EPITECH !<br />
+	Le principe est simple: vous avez une minute pour associer le maximum de login à des photos d'étudiants.<br />
+	Combien en trouverez-vous ? Serez-vous assez rapide ?
+</p>
+<button class="btn btn-primary" ng-click="begin()">Commencer !</button>
+
+<div modal="loginModal.opened" close="loginModal.close()" options="loginModal.options">
+	<form class="form-horizontal login-form" name="form" ng-submit="login()" novalidate>
+		<div class="modal-header">
+			<h4>Connexion</h4>
+		</div>
+		<div class="modal-body">
+			<p>Ce jeu est réservé aux étudiants d'EPITECH, vous devez vous identifier pour pouvoir y accéder !</p>		
+			<div class="control-group">
+				<label class="control-label" for="login">Login</label>
+				<div class="controls">
+					<input id="login" type="text" placeholder="Login" ng-model="form.login" required>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="password">Mot de passe</label>
+				<div class="controls">
+					<input id="password" type="password" placeholder="Mot de passe" ng-model="form.password" required>
+				</div>
+			</div>
+			<div ng-show="authFailed">
+				<alert type="'error'" close="authFailed = false">
+					Erreur: Identifiants incorrects !<br />(Si le problème persiste, assurez-vous que l'intra soit bien disponible)
+				</alert>
+			</div>
+			<small>
+				Non, vos mots de passe ne sont pas enregistrés. Les sources de cette application sont sur GitHub, il n'y a rien de bien méchant, juste du fun ;)
+			</small>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" ng-click="loginModal.close()">Tant pis</a>
+			<button class="btn btn-primary" ng-disabled="form.$invalid || authLoading">{{ authLoading && 'Chargement...' || 'C\'est parti !' }}</button>
+		</div>
+	</form>
+</div>

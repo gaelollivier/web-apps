@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html ng-app="app">
+	<head>
+		<meta charset="utf-8">
+		<title>Gallerie Raytracer EPITECH</title>
+		
+		<meta name="description" content="EPITECH Raytracer gallery. Simply presents galleries from epitech.eu/~ol in a more modern manner">
+		<meta name="author" content="Gael Jochaud du Plessix">
+		
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+		
+		<style type="text/css">
+			@media(min-width:979px) {
+				body {
+					padding-top: 60px;
+				}
+			}
+			
+			.control-group.pull-left {
+				margin-right: 10px;
+			}
+									
+			.loader {
+				padding: 20px;
+				text-align: center;				
+			}
+			
+			.loader > img {
+				width: 24px;
+			}
+			
+			.images {
+				margin: 0px;
+				list-style-type: none;
+			}
+			
+			.images >li {
+				-webkit-transition: all 0.5s ease;
+				-moz-transition: all 0.5s ease;
+				-ms-transition: all 0.5s ease;
+				-o-transition: all 0.5s ease;
+				transition: all 0.5s ease;
+			}
+			
+			.images > li {
+				padding: 10px;
+				margin: 10px;
+				text-align: center;
+				border-radius: 5px;
+				background: -webkit-linear-gradient(#f5f5f5 0%, #fbfbfb 100%);
+				border: 1px solid #fff;
+				box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
+			}
+			
+			@media(max-width:768px) {
+				.images > li {
+					margin: 10px 0px;
+				}
+			}
+			
+			.images > li:hover {
+				box-shadow: 0px 1px 10px rgba(64, 174, 226, 0.8);
+			}
+			
+			.image {
+				display: block;
+				height: 125px;
+				line-height: 125px;
+				margin-bottom: 12px;
+			}
+			
+			.image > img {
+				max-width: 95%;
+				max-height: 100%;						
+			}
+			
+			.images > li span {
+				display: block;
+			}
+			
+			.city {
+				color: #7f7f7f;
+			}
+		</style>
+		
+	</head>	
+	<body ng-controller="MainController">
+	
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<button type="button" class="btn btn-navbar" ng-click="navCollapse = !navCollapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="brand" href="#/">Raytracer EPITECH</a>
+					<div class="nav-collapse collapse" collapse="navCollapse">
+						<ul class="nav">
+							<li ng-class="{active: $location.path() == '/'}"><a href="#/">Gallery</a></li>
+							<li ng-class="{active: $location.path() == '/about'}"><a href="#/about">About</a></li>
+						</ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</div>
+		</div>
+		
+		<div class="container" ng-view></div> <!-- /container -->
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+		<script src="js/ui-bootstrap-tpls.min.js"></script>
+		
+		<!-- Fancybox -->
+		<link rel="stylesheet" href="js/fancybox/source/jquery.fancybox.css?v=2.1.5" type="text/css" media="screen" />
+		<script type="text/javascript" src="js/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+		
+		<script type="text/javascript">
+			
+			(function() {
+				'use strict';
+				
+				angular.
+					module('app', ['ui.bootstrap']).
+					config(function($routeProvider) {
+						$routeProvider.
+							when('/', {controller:'MainController', templateUrl:'gallery.html'}).
+							when('/about', {templateUrl:'about.html'}).
+							otherwise({redirectTo:'/'})
+						;
+					}).
+					run(function($rootScope, $location) {
+						$rootScope.$location = $location;
+					}).
+					controller('MainController', function($scope, $http) {
+						$scope.navCollapse = true;
+						$scope.images = [];
+						
+						var lastPromo = 2017;
+						
+						$scope.promo = lastPromo;
+						$scope.order = 'votes';
+						
+						$scope.promos = [];
+						
+						$scope.gallery = 'gallerie';
+						
+						for (var i = 2005; i <= lastPromo; ++i) {
+							$scope.promos[i] = i;
+						}
+						
+						$scope.$watch('promo', function(promo) {
+							$scope.filter = '';
+							if (promo != lastPromo) {
+								$scope.gallery = 'gallerie-'+promo;
+							} else {
+								$scope.gallery = 'gallerie';
+							}
+							$scope.images = [];
+							$http.get('gallery.php?gallery='+$scope.gallery).then(function(response) {
+								$scope.images = response.data;
+							});				
+						});
+						
+						$scope.$watch('images', function() {
+							// Yes, that's crappy, should write a directive...
+							$('.image').fancybox({
+								beforeLoad: function() {
+						            this.title = $(this.element).find('img').attr('alt');
+						        }
+							});
+						});
+					})
+				;
+				
+						
+			}());			
+						
+		</script>
+<!--
+		
+		Well, if you went here, you probably want to see how "gallery.php" works... So here it is ;)
+		
+		<?php
+		
+		$url = 'http://perso.epitech.eu/~ol/work/raytracer/'.$_GET['gallery'].'/index.html';
+		
+		// Could simply use 'file_get_contents' but 1and1 is blocking urls from it...
+		$page = httpGet($url);
+		// Remove line returns
+		$page = str_replace("\n", '', $page);
+		$xml = @DOMDocument::loadHTML($page);
+		
+		$tables = $xml->getElementsByTagName('table');
+		$mainTable = false;
+		foreach ($tables as $table) {
+			if ($table->hasAttribute('border') && $table->getAttribute('border') == 1) {
+				$mainTable = $table;
+				break;
+			}
+		}
+		
+		if (!$mainTable)
+			die;
+		
+		$tds = $mainTable->getElementsByTagName('td');
+		
+		$images = array();
+		
+		foreach ($tds as $td) {
+			// Keep only td's with 'img' and 'a' elements and then match the data
+			$imgs = $td->getElementsByTagName('img');
+			$a = $td->getElementsByTagName('a');
+			if ($imgs->length > 0 && $a->length > 0) {
+				// Parse infos
+				if (preg_match('#(?<login>[\w_-]+)( \((?<city>\w+)\) ?(\[vote: (?<votes>[0-9]+)\])?)?#', $td->textContent, $matches)) {
+					$images[] = array(
+						'login' => $matches['login'],
+						'city' => $matches['city'] ? $matches['city'] : 'Paris',
+						'votes' => (int)$matches['votes'],
+						'mini' => $imgs->item(0)->getAttribute('src'),
+						'big' => $a->item(0)->getAttribute('href')
+					);
+				}
+			}
+		}
+		
+		echo json_encode($images);
+		
+		function httpGet($url) {
+			// create curl resource 
+			$ch = curl_init(); 
+			
+			// set url 
+			curl_setopt($ch, CURLOPT_URL, $url); 
+			
+			//return the transfer as a string 
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+			
+			// $output contains the output string 
+			$output = curl_exec($ch); 
+			
+			// close curl resource to free up system resources 
+			curl_close($ch);
+			
+			return $output;
+		}
+-->
+
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-36533977-1']);
+		  _gaq.push(['_trackPageview']);
+		
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		
+		</script>
+				
+	</body>
+
+</html>
