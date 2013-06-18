@@ -6,7 +6,7 @@ body {
 	color: white;
 }
 
-.title h1 {
+h1 {
 	text-align: center;
 	color: white;
 	font-size: 30px;
@@ -38,28 +38,33 @@ body {
 	height: 460px;
 }
 
-#controls label {
+label, .label {
 	float: left;
 }
 
-#controls .label {
-	float: left;
-}
-
-#controls input {
+input {
 	float: left;
 	border: none;
 	margin-bottom: 10px;
+	background: transparent;
+	color: white;
+	width: 100%;
 }
 
-#controls .colorpicker {
+.vec3 {
+	width: 100%;
+    background: transparent;
+    color: white;
+}
+
+.colorpicker {
 	clear: both;
 	width: 195px;
 	margin: auto;
 	margin-top: 5px;	
 }
 
-#controls .slider {
+.slider {
 	float: left;
 	width: 100%;
 	margin-top: 5px;
@@ -72,13 +77,13 @@ body {
 	margin-top: 5px;
 }
 
-#controls .vector {
+.vector {
 	float: left;
 	width: 100%;
 	margin-top: 5px;
 }
 
-#controls .vector input {
+.vector input {
 	margin-left: 5px;
 	margin-right: 5px;
 	width: 60px;
@@ -87,13 +92,22 @@ body {
 	color: white;
 }
 
-#controls .vector-label {
+.vector-label {
 	float: left;
 	line-height: 19px;	
 }
 
-#controls input {
-	width: 100%;
-	background: transparent;
-	color: white;
+#materials {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+#materials li {
+    padding: 5px;
+}
+
+#new-material {
+    float: right;
+    margin: 5px 0px;
 }

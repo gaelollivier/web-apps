@@ -52,7 +52,7 @@ var Controls = new function() {
 		// Create controls accordion
 		$('#controls .accordion').accordion({
 			heightStyle: 'fill',
-			active: 0
+			active: 2
 		});
 		
 		// Scene controls
@@ -131,6 +131,9 @@ var Controls = new function() {
 			scene.camera.setFocusDistance($(this).val());
 			renderer.reset();
 		});
+		
+		// Materials
+		$('#new-material').button();
 	};
 	
 	this.populateValues = function(section) {

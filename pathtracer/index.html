@@ -10,15 +10,15 @@
 		
 		<!-- jQuery UI -->
 		<link rel="stylesheet" href="css/dark-hive/jquery.ui.min.css">
-		<script type="text/javascript" src="js/jquery.min.js"></script>
-		<script src="js/ui/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/lib/jquery.min.js"></script>
+		<script src="js/lib/jquery-ui.min.js"></script>
 		
 		<!-- Color Picker -->
-		<script type="text/javascript" src="js/farbtastic.js"></script>
+		<script type="text/javascript" src="js/lib/farbtastic.js"></script>
 		<link rel="stylesheet" href="css/farbtastic.css" type="text/css" />
 				
-		<script type="text/javascript" src="js/stats.min.js"></script>		
-		<script type="text/javascript" src="js/gl-matrix-min.js"></script>
+		<script type="text/javascript" src="js/lib/stats.min.js"></script>		
+		<script type="text/javascript" src="js/lib/gl-matrix-min.js"></script>
 		
 		<!-- Pathtracer -->
 		<script type="text/javascript" src="js/Utilities.js"></script>		
@@ -56,9 +56,9 @@
 					<h3>Camera</h3>
 					<div>
 						<span class="label">Position:</span>
-						<div id="camera-position"></div>
+						<div id="camera-position" class="vec3"></div>
 						<span class="label">Target:</span>
-						<div id="camera-target"></div>
+						<div id="camera-target" class="vec3"></div>
 						<label for="camera-fov">Field of view:</label>
 						<div id="camera-fov" class="slider"></div>						
 						<label for="camera-aperture">Aperture:</label>
@@ -68,7 +68,12 @@
 					</div>										
 					<h3>Materials</h3>
 					<div>
-						Work in progress...
+						<ul id="materials">
+						    <li class="ui-state-default ui-corner-all">
+						        {{material.name}}
+						    </li>
+						</ul>
+                        <button id="new-material">New material</button>
 					</div>
 					<h3>Objects</h3>
 					<div>
