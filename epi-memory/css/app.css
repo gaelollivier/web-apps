@@ -29,7 +29,7 @@
 
 #students-entered {
 	list-style-type: none;
-	margin: 0;	
+	margin-bottom: 20px;
 }
 
 #students-entered li {

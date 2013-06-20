@@ -133,10 +133,11 @@
 			
 			$scope.$watch('promo', function(newValue) {
 				if (newValue) {
+				    $scope.cities = undefined;
+				    $scope.city = undefined;
 					// Get the list of cities for the selected promo
 					epitech.cities(newValue).then(function(cities) {
 						$scope.cities = cities;
-						$scope.city = undefined;					
 					});
 				}		
 			});
@@ -170,7 +171,7 @@
 			
 			// Game
 			
-			$scope.totalTime = 60;
+			$scope.totalTime = 5;
 			$scope.gameBegan = false;
 			$scope.studentsEntered = [];
 			$scope.score = 0;
@@ -181,9 +182,9 @@
 			
 			var selectNewStudent = function() {
 				$scope.inputLogin = '';
-				if ($scope.students.length > 0) {
-					currentStudentIndex = Math.round(Math.random() * ($scope.students.length - 1));
-					$scope.currentStudent = $scope.students[currentStudentIndex];
+				if ($scope.studentsLeft.length > 0) {
+					currentStudentIndex = Math.round(Math.random() * ($scope.studentsLeft.length - 1));
+					$scope.currentStudent = $scope.studentsLeft[currentStudentIndex];
 				} else {
 					$scope.endGame();
 				}
@@ -204,12 +205,16 @@
 			
 			$scope.beginGame = function() {
 				$scope.gameForm = false;
+				$scope.gameReport = false;
 				$scope.gameBegan = true;
 				
 				$scope.startTime = new Date().getTime();
 				$scope.score = 0;
 				
 				$scope.validStudents = 0;
+				$scope.studentsEntered = [];
+				
+				$scope.studentsLeft = $scope.students.slice(0); // Copy students array
 				
 				selectNewStudent();
 				updateGame();
@@ -227,18 +232,32 @@
 					if ($scope.inputLogin == $scope.currentStudent.login) {
 						$scope.validStudents += 1;
 						$scope.score += 42;
-						$scope.students.splice(currentStudentIndex, 1);
+						$scope.studentsLeft.splice(currentStudentIndex, 1);
 					}
 					selectNewStudent();
 				}
 			};
-			
-			
+						
 			$scope.endGame = function() {
 				$scope.gameBegan = false;
 				$scope.gameReport = true;						
 					
 				$scope.scoreEvaluation = $scope.validStudents / ($scope.totalTime / timePerStudent);
+				
+				// Send score
+				
+				// TODO
+			};
+			
+			$scope.resetGame = function() {
+    			$scope.gameBegan = false;
+    			$scope.gameReport = false;    			
+    			$scope.gameForm = true;
+    			
+    			$scope.students = [];
+    			$scope.promo = undefined;
+    			$scope.cities = undefined;
+    			$scope.city = undefined;
 			};
 			
 		}).
