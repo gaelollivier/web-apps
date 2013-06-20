@@ -9,6 +9,9 @@ angular.
 			
 			$this.auth = true;
 			
+			// Will hold the login of the authenticated student
+			$this.login = undefined;
+			
 			// An event handler to be notified when service finish an login request
 			$this.onAuthenticate = angular.noop;
 			
@@ -25,7 +28,10 @@ angular.
 					password: password
 				}).then(function(response) {
 					$this.auth = (response.data.auth == 'success');
-					$this.onAuthenticate($this.auth);
+					if ($this.auth) {
+    					$this.login = response.data.login;
+					}
+					$this.onAuthenticate($this.auth, $this.login);
 					deferred.resolve($this.auth);
 				}, function() {
 					deferred.reject();
@@ -136,7 +142,10 @@ angular.
 				action	: 'isAuthenticated'
 			}).success(function(response) {
 				$this.authenticated = (response.auth == 'success');
-				$this.onAuthenticate($this.authenticated);
+				if ($this.authenticated) {
+    				$this.login = response.login;
+				}
+				$this.onAuthenticate($this.authenticated, $this.login);
 			});
 		};
 		

@@ -13,6 +13,7 @@
 			$routeProvider.
 				when('/', {controller: 'HomeController', templateUrl:'partials/home.html', data:'ca'}).
 				when('/game', {controller: 'GameController', templateUrl:'partials/game.html'}).
+				when('/leaderboard', {controller: 'LeaderboardController', templateUrl:'partials/leaderboard.html'}).
 				when('/about', {controller: 'AboutController', templateUrl:'partials/about.html'}).
 				otherwise({redirectTo:'/'})
 			;
@@ -51,6 +52,28 @@
 			$rootScope.$location = $location;
 		}).		
 		controller('EpiMemoryController', function($scope, $routeParams){
+			$scope.promos = {
+				'2017' : 'EPITECH 2017',
+				'2016' : 'EPITECH 2016',
+				'2015' : 'EPITECH 2015',
+				'2014' : 'EPITECH 2014',
+				'2013' : 'EPITECH 2013'
+			};
+			
+			$scope.citiesNames = {
+				'PAR' : 'Paris',
+				'TLS' : 'Toulouse',
+				'NAN' : 'Nantes',
+				'LYN' : 'Lyon',
+				'LIL' : 'Lille',
+				'NCE' : 'Nice',
+				'BDX' : 'Bordeaux',
+				'MAR' : 'Marseille',
+				'STG' : 'Strasbourg',
+				'NCY' : 'Nancy',
+				'MPL' : 'Montpellier',
+				'REN' : 'Rennes'
+			};
 		}).
 		controller('HomeController', function($scope, $location, epitech) {
 			$scope.loginModal = {
@@ -88,7 +111,7 @@
 				}
 			};
 		}).
-		controller('GameController', function($scope, $location, epitech, $timeout) {
+		controller('GameController', function($scope, $location, $timeout, $http, epitech) {
 		
 			if (!epitech.isAuthenticated()) {
 				$timeout(function() {
@@ -100,29 +123,6 @@
 			// Game form
 			
 			$scope.gameForm = true;
-		
-			$scope.promos = {
-				'2017' : 'EPITECH 2017',
-				'2016' : 'EPITECH 2016',
-				'2015' : 'EPITECH 2015',
-				'2014' : 'EPITECH 2014',
-				'2013' : 'EPITECH 2013'
-			};
-			
-			$scope.citiesNames = {
-				'PAR' : 'Paris',
-				'TLS' : 'Toulouse',
-				'NAN' : 'Nantes',
-				'LYN' : 'Lyon',
-				'LIL' : 'Lille',
-				'NCE' : 'Nice',
-				'BDX' : 'Bordeaux',
-				'MAR' : 'Marseille',
-				'STG' : 'Strasbourg',
-				'NCY' : 'Nancy',
-				'MPL' : 'Montpellier',
-				'REN' : 'Rennes'
-			};
 			
 			$scope.cities = [];
 			
@@ -245,8 +245,17 @@
 				$scope.scoreEvaluation = $scope.validStudents / ($scope.totalTime / timePerStudent);
 				
 				// Send score
-				
-				// TODO
+				if ($scope.score > 0) {
+					$scope.savingScore = true;
+					$http.post('save-score.php', {
+	    				login   : epitech.login,
+	    				promo   : $scope.promo,
+	    				city    : $scope.city,
+	    				score   : $scope.score
+					}).then(function(){
+					    $scope.savingScore = false;
+					});
+				}
 			};
 			
 			$scope.resetGame = function() {
@@ -260,6 +269,27 @@
     			$scope.city = undefined;
 			};
 			
+		}).
+		
+		controller('LeaderboardController', function($scope, $http) {
+			var scores = $scope.scores = [],
+				values;
+			// Load the scores
+			$http.get('scores.json').then(function(response) {
+				// Construct the scores table
+				scores.length = 0;
+				for (var key in response.data) {
+					if (response.data.hasOwnProperty(key)) {
+						values = key.split('/');
+						scores.push({
+							login: values[0],
+							promo: values[1],
+							city: $scope.citiesNames[values[2]],
+							score: response.data[key]
+						});
+					}
+				}
+			});
 		}).
 		
 		controller('AboutController', function($scope) {

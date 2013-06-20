@@ -29,7 +29,8 @@ echo sendResponse(null, false);
 function authAction($data) {
 	if (authenticate($data->login, $data->password)) {
 		$_SESSION['auth'] = true;
-		sendResponse(array('auth'=>'success'));
+		$_SESSION['login'] = $data->login;
+		sendResponse(array('auth'=>'success', 'login'=>$_SESSION['login']));
 	} else {
 		session_destroy();
 		sendResponse(array('auth'=>'fail'));
@@ -43,7 +44,8 @@ function logOutAction() {
 
 function isAuthenticatedAction($data) {
 	sendResponse(array(
-		'auth' => $_SESSION['auth'] === true ? 'success' : 'fail'
+		'auth'  => $_SESSION['auth'] === true ? 'success' : 'fail',
+		'login' => isset($_SESSION['login']) ? $_SESSION['login'] : ''
 	));
 }
 

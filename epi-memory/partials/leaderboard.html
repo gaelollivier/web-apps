@@ -1,0 +1,28 @@
+<div class="hero-unit">
+	<h1>Leaderboard</h1>
+	<p>Classement des meilleurs scores</p>
+</div>
+
+<form class="form-search">
+	<div class="input-prepend">
+		<button class="btn" disabled>Filter</button>
+		<input type="text" class="search-query" ng-model="filter">
+	</div>
+</form>
+
+<table class="table table-bordered table-striped table-hover">
+	<thead>
+		<th>Login</th>
+		<th>Promo</th>
+		<th>Ville</th>
+		<th>Score</th>
+	</thead>
+	<tbody>
+		<tr ng-repeat="score in scores | filter:filter | orderBy:'score':true">
+			<td>{{score.login}}</td>
+			<td>{{promos[score.promo]}}</td>
+			<td>{{score.city}}</td>
+			<td>{{score.score}}</td>
+		</tr>
+	</tbody>
+</table>

@@ -48,6 +48,7 @@
 		Tu as trouvé {{validStudents}} login{{validStudents != 1 && 's' || ''}} !
 	</p>
 	<h3>Score: {{score}}</h3>
+	<p ng-show="savingScore">Saving score...</p>
 	<ul id="students-entered" class="clearfix">
 		<li ng-repeat="studentEntered in studentsEntered" ng-class="{span3:true, valid: studentEntered.login == studentEntered.student.login}">
 			<img ng-src="{{studentEntered.student.photo.src}}" alt="{{studentEntered.student.login}}" class="img-polaroid" />
@@ -55,6 +56,9 @@
 			<span>Login entré: <strong class="login-entered">{{studentEntered.login}}</strong></span>
 		</li>
 	</ul>
-	<button class="btn btn-primary" ng-click="beginGame()">Rejouer !</button>
+</div>
+
+<div ng-hide="gameForm" class="control-group">
+    <button class="btn btn-primary" ng-click="beginGame()">{{gameBegan && 'Recommencer la partie' || 'Rejouer !'}}</button>
 	<button class="btn" ng-click="resetGame()">Jouer avec une autre promo</button>
 </div>
