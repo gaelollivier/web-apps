@@ -171,7 +171,7 @@
 			
 			// Game
 			
-			$scope.totalTime = 5;
+			$scope.totalTime = 60;
 			$scope.gameBegan = false;
 			$scope.studentsEntered = [];
 			$scope.score = 0;
