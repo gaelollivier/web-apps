@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Still alive</title>
+        
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+		
+		<style type="text/css">
+		    body {
+    		    background: #040505;
+		    }
+		    
+		    body, a, a:hover, pre {
+			    color: rgb(255,161,1);
+    		    font-family: "Courier New", monospace;
+    		    font-weight: 600;
+    		    font-size: 15px;
+    		    text-decoration: none;
+				line-height: 23px;
+		    }
+		    
+		    pre {
+				background: transparent;                
+    		    padding: 0px;
+		    }
+		    
+		    .container {
+				width: 910px;
+		    }
+		    
+		    #controls {
+		        transition: all 0.2s ease;
+    		    opacity: 0;
+		    }
+		    
+		    #controls:hover {
+		        opacity: 1;
+		    }
+		    		    
+		    .progress {
+		    	border-radius: 0px;
+			    border: 1px solid #E2A302;
+			    padding: 1px;
+			    width: 100%;
+			    background: transparent;
+			    height: 8px;
+			    margin: 0px;
+			    cursor: pointer;
+		    }		    
+		    
+		    .progress .bar {
+		    	transition: none;
+			    background: #E2A302;
+		    }
+		    
+		    .scripted-text, .ascii-text {
+    		    display: none;
+		    }		    
+		</style>
+		
+	</head>	
+	<body>
+	
+<!--
+		Hey ! Are you looking for the source ? Don't waste your time here...
+		This app is on GitHub !
+		https://github.com/gaelduplessix/web-apps
+-->
+
+		<audio id="song">
+			<source src="still-alive-hq.mp3" type="audio/mpeg">
+			<source src="still-alive.ogg" type="audio/ogg">
+			<source src="still-alive.aac" type="audio/aac">
+		</audio>
+		
+		<p id="debug"></p>
+		
+		<div class="container">
+		    <div id="controls">
+    			<div id="progress" class="progress">
+    				<div class="bar"></div>
+    			</div>
+		    </div>
+			
+			<pre id="container">
+			</pre>
+		</div>
+		
+
+<div id="ascii-arts-script" class="scripted-text">
+22.5|aperture
+34.8|//--//
+34.8|biohazard
+36.8|//--//
+36.8|aperture
+45|//--//
+45|atom
+48.8|//--//
+48.8|aperture
+69.6|//--//
+69.6|broken-heart
+74.4|//--//
+74.4|explosion
+80.9|//--//
+80.9|fire
+86.9|//--//
+86.9|check
+96.9|//--//
+96.9|explosion
+98.9|//--//
+98.9|atom
+100.9|//--//
+100.9|aperture
+127.3|//--//
+127.3|black-mesa
+137|//--//
+137|cake
+141.1|//--//
+141.1|glados
+142.9|//--//
+142.9|biohazard
+145|//--//
+145|aperture
+149.1|//--//
+149.1|atom
+151.1|//--//
+151.1|explosion
+153|//--//
+153|aperture
+</div>
+        
+<div id="lyrics-text" class="scripted-text">
+0|:4|Forms FORM-29827281-12:\nTest Assesment Report\n\n
+6.5|8|This was a triumph.\n
+10.5|12|I'm making a note here:\n
+12.5|14|HUGE SUCCESS.\n
+15.3|17.7|It's hard to overstate\n
+17.7|20.5|my satisfaction.\n
+22.5|24.5|Aperture Science\n
+26.5|27.7|We do what we must\n
+28.2|29.9|because we can.\n
+31.6|34.6|For the good of all of us.\n
+34.8|36.8|Except the ones who are dead.\n\n
+37.2|39.1|But there's no sense crying\n
+39.1|40.9|over every mistake.\n
+41|43|You just keep on trying\n
+43|44.9|till you run out of cake.\n
+45|46.7||And the Science gets done.\n
+46.7|48.8|And you make a neat gun.\n
+48.8|50.6|For the people who are\n
+50.6|51.8|still alive.\n
+53.8|//--//
+53.8|55.8|Forms FORM-555551-5:\nPersonnel File Addendum:\n
+56.4|58.2|\nDear &lt;&lt;Subject Name Here&gt;&gt;,\n\n
+58.2|59.8|I'm not even angry.\n
+62.5|65.7|I'm being so sincere right now.\n
+67.5|69.6|Even though you 
+69.6|70.7|broke my heart.\n
+70.7|72.5|And killed me.\n
+74.4|76|And tore me to pieces.\n
+78.3|79.6|And threw every piece
+79.9|80.5| into
+80.9|82| a fire.\n
+83.6|86.6|As they burned it hurt because\n
+86.9|88.5|I was so happy for you!\n
+89|91|Now these points of data\n
+91|92.9|make a beautiful line\n
+92.9|95|And we're out of beta.\n
+95|96.9|We're releasing on time.\n
+96.9|98.9|So I'm GLaD. I got burned.\n
+98.9|100.9|Think of all the things we learned\n
+100.9|102.6|for the people who are\n
+102.6|102.9|still
+102.9|104.6| alive.\n
+1:45.8|//--//
+1:45.8|1:47.6|Forms FORM-555551-6:\nPersonnel File Addendum Addendum:\n
+1:48.4|110.7|\nOne last thing:\n\n
+110.6|111.9|Go ahead and leave
+111.9|112.5| me.\n
+114.3|118.1|I think I prefer to stay inside.\n
+119.6|122.8|Maybe you'll find someone else\n
+122.8|124.2|to help you.\n
+126.6|127.3|Maybe Black
+127.3|128.4| Mesa
+128.4|130.4|...\n
+130.6|131.7|THAT WAS A JOKE.
+133|134| FAT CHANCE.\n
+135.4|137|Anyway,
+137|138.9| this cake is great.\n
+138.9|140.8|It's so delicious and moist.\n
+141.1|142.9|Look at me still talking\n
+142.9|145|when there's Science to do.\n
+145|147|When I look out there,\n
+147|149.1|it makes me GLaD I'm not you.\n
+149.1|151.1|I've experiments to run.\n
+151.1|153|There is research to be done.\n
+153|154.7|On the people who are\n
+154.7|155|still 
+155|156.8|alive.\n
+157|//--//
+157|\n\n\n
+157|158.7|PS: And believe me I am\n
+158.7|159.1|still 
+159.1|160|alive.\n
+160.6|161|PPS: 
+161|162.7|I'm doing Science and I'm\n
+162.7|163.1|still 
+163.1|164|alive.\n
+164.6|165|PPPS: 
+165|166.6|I feel FANTASTIC and I'm\n
+166.6|167.1|still 
+167.1|168.1|alive.\n
+168.1|169.1|\nFINAL THOUGHT:\n
+169.1|170.7|While you're dying I'll be\n
+170.7|171|still 
+171|172.2|alive.\n
+172.2|173|\nFINAL THOUGHT PS:\n
+173|174.6|And when you're dead I will be\n
+174.6|175|still 
+175|176.1|alive.\n
+176.1|\n
+176.7|178|STILL ALIVE
+178.1|//--//
+</div>
+
+<div id="credits-text" class="scripted-text">
+9|182|&gt;LIST PERSONNEL\n\n\nGautam Babbar\nTed Backman\nKelly Bailey\nJeff Ballinger\nAaron barber\nJeep Barnett\nJeremy Bennet\nDan Berger\nYahn Bernier\nKen Birdwell\nDerrick Birum\nMike Blaszczak\nIestyn Bleasdale-Sheperd\nChris Bokitch\nSteve Bond\nMatt Boone\nAntoine Bourdon\nJamaal Bradley\nJason Brashill\nCharlie Brown\nCharlie Burgin\nAndew Burke\nAugusta Butlin\nJulie Caldwell\nDario Casali\nChris Chin\nJess Cliffe\nPhill Co\nJohn Cook\nChristen Coomer\nGreg Coomer\nScott Dalton\nKerry Davis\nJason Deakins\nJoe Demers\nAriel Diaz\nQuintin Doroquez\nJum Dose\nChris Douglass\nLaura Dubuk\nMike Dunkle\nMike Durand\nMike Dussault\nDhabih Eng\nKatie Engel\nChet Faliszek\nAdrian Finol\nBill Fletcher\nMoby Francke\nStephane Gaudette\nKathy Gehrig\nVitaliy Genkin\nPaul Graham\nChris Green\nChris Grinstead\nJohn Guthrie\nAaron Halifax\nReagan Halifax\nLeslie Hall\nJeff Hameluck\nJoe Han\nDon Holden\nJason Holtman\nGray Horsfield\nKeith Huggins\nJim Hughes\nJon Huisingh\nBrian Jacobson\nLars Jensvold\nErik Johnson\nJakob Jungels\nRich Kaethler\nSteve Kalning\nAaron Kearly\nIikka Keranen\nDavid Kircher\nEric Kirchmer\nScott Klintworth\nAlden Kroll\nMarc Laidlaw\nJeff Lane\nTim Larkin\nDan LeFree\nIsabell LeMay\nTom Leonard\nJeff Lind\nDoug Lombardi\nBianca Loomis\nRichard Lord\nRealm Lovejoy\nRandy Lundeen\nScott Lynch\nIdo Magal\nNick Maggiore\nJohn McCaskey\nPatrick McClard\nSteve McClure\nHamish McKenzie\nGary McTaggart\nJason Mitchell\nMike Morasky\nJohn Morello II\nBryn Moslow\nArsenio Navarro\nGabe Newell\nMilton Ngan\nJake Nicholson\nMartin Otten\nNick Papineau\nKaren Prell\nBay Raitt\nTristan Reidford\nAlfred Reynolds\nMatt Rhoten\nGarret Rickey\nDave Riller\nElan Ruskin\nMatthew Russell\nJason Ruymen\nDavid Sawyer\nMarc Scaparro\nWade Schin\nMatthew Scott\nAaron Seeler\nJennifer Seeley\nTaylor Sherman\nEric Smith\nJeff Sorensen\nDavid Speyrer\nJay Stelly\nJeremy Stone\nEric Strand\nKim Swift\nKelly Thornton\nEric Twelker\nCarl Uhlman\nDoug Valente\nBill Van Buren\nGabe Van Engel\nAlex Vlachos\nRobin Walker\nJoshua Weier\nAndrea Wicklund\nGreg Winkler\nErik Wolpaw\nDoug Wood\nMatt T. Wood\nDanika Wright\nMatt Wright\nShawn Zabecki\nTorsten Zabka\n\n\n\n\n'Still Alive' by:\nJonathan Coulton\n\n\n\nVoices:\nEllen McLain - GlaDOS, Turrets\nMike Patton - THE ANGER SPHERE\n\n\n\nVoices Casting:\nShana Landsburg\Teri Fiddleman\n\n\n\n\nVoice Recording:\nPure Audio, Seattle, WA\n\n\n\n\nVoice recording\nscheduling and logistics:\nPat Cockburn, Pure Audio\n\n\n\n\nTranslations:\nSDL\n\n\n\n\nCrack Legal Team:\nLiam Lavery\nKarl Quackenbush\nKristen Boraas\nKevin Rosenfield\nAlan Burggeman\nDennis Tessier\n\n\n\nThanks for the use of their face:\nAlesia Glidewell - Chell\n\n\n\nSpecial thanks to everyone at:\nAlienware\nATI\nDell\nFalcon Northwest\nHavok\nSOFTIMAGE\nand Don Kemmis, SLK Technologies\n\n\n\n\n\n\n\n\n\nTHANK YOU FOR PARTICIPATING\nIN THIS\nENRICHMENT CENTER ACTIVITY!!\n\n\n\n\n\n</div>
+
+<div id="ascii-aperture" class="ascii-text">
+              .,-:;//;:=,
+          . :H@@@MM@M#H/.,+%;,
+       ,/X+ +M@@M@MM%=,-%HMMM@X/,
+     -+@MM; $M@@MH+-,;XMMMM@MMMM@+-
+    ;@M@@M- XM@X;. -+XXXXXHHH@M@M#@/.
+  ,%MM@@MH ,@%=            .---=-=:=,.
+  =@#@@@MX .,              -%HX$$%%%+;
+ =-./@M@M$                  .;@MMMM@MM:
+ X@/ -$MM/                    .+MM@@@M$
+,@M@H: :@:                    . =X#@@@@-
+,@@@MMX, .                    /H- ;@M@M=
+.H@@@@M@+,                    %MM+..%#$.
+ /MMMM@MMH/.                  XM@MH; =;
+  /%+%$XHH@$=              , .H@@@@MX,
+   .=--------.           -%H.,@@@@@MX,
+   .%MM@@@HHHXX$$$%+- .:$MMX =M@@MM%.
+     =XMMM@MM@MM#H;,-+HMM@M+ /MMMX=
+       =%@M@M#@$-.=$@MM@@@M; %M%=
+         ,:+$+-,/H#MMMMMMM@= =,
+               =++%%%%+/:-.
+</div>
+<div id="ascii-cake" class="ascii-text">
+            ,:/+/-
+            /M/              .,-=;//;-
+       .:/= ;MH/,    ,=/+%$XH@MM#@:
+      -$##@+$###@H@MMM#######H:.    -/H#
+ .,H@H@ X######@ -H#####@+-     -+H###@X
+  .,@##H;      +XM##M/,     =%@###@X;-
+X%-  :M##########$.    .:%M###@%:
+M##H,   +H@@@$/-.  ,;$M###@%,          -
+M####M=,,---,.-%%H####M$:          ,+@##
+@##################@/.         :%H##@$-
+M###############H,         ;HM##M$=
+#################.    .=$M##M$=
+################H..;XM##M$=          .:+
+M###################@%=           =+@MH%
+@################M/.          =+H#X%=
+=+M##############M,       -/X#X+;.
+  .;XM##########H=    ,/X#H+:,
+     .=+HM######M+/+HM@+=.
+         ,:/%XM####H/.
+              ,.:=-.
+</div>
+<div id="ascii-explosion" class="ascii-text">
+            .+
+             /M;
+              H#@:              ;,
+              -###H-          -@/
+               %####$.  -;  .%#X
+                M#####+;#H :M#M.
+..          .+/;%#########X###-
+ -/%H%+;-,    +##############/
+    .:$M###MH$%+############X  ,--=;-
+        -/H#####################H+=.
+           .+#################X.
+         =%M####################H;.
+            /@###############+;;/%%;,
+         -%###################$.
+       ;H######################M=
+    ,%#####MH$%;+#####M###-/@####%
+  :$H%+;=-      -####X.,H#   -+M##@-
+ .              ,###;    ;      =$##+
+                .#H,               :XH,
+                 +                   .;-
+</div>
+
+<div id="ascii-atom" class="ascii-text">
+                 =/;;/-
+                +:    //
+               /;      /;
+              -X        H.
+.//;;;:;;-,   X=        :+   .-;:=;:;%;.
+M-       ,=;;;#:,      ,:#;;:=,       ,@
+:%           :%.=/++++/=.$=           %=
+ ,%;         %/:+/;,,/++:+/         ;+.
+   ,+/.    ,;@+,        ,%H;,    ,/+,
+      ;+;;/= @.  .H##X   -X :///+;
+      ;+=;;;.@,  .XM@$.  =X.//;=%/.
+   ,;:      :@%=        =$H:     .+%-
+ ,%=         %;-///==///-//         =%,
+;+           :%-;;;:;;;;-X-           +:
+@-      .-;;;;M-        =M/;;;-.      -X
+ :;;::;;-.    %-        :+    ,-;;-;:==
+              ,X        H.
+               ;/      %=
+                //    +;
+                 ,////,
+</div>
+<div id="ascii-biohazard" class="ascii-text">
+             =+$HM####@H%;,
+          /H###############M$,
+          ,@################+
+           .H##############+
+             X############/
+              $##########/
+               %########/
+                /X/;;+X/
+ 
+                 -XHHX-
+                ,######,
+#############X  .M####M.  X#############
+##############-   -//-   -##############
+X##############%,      ,+##############X
+-##############X        X##############-
+ %############%          %############%
+  %##########;            ;##########%
+   ;#######M=              =M#######;
+    .+M###@,                ,@###M+.
+       :XH.                  .HX:
+</div>
+<div id="ascii-black-mesa" class="ascii-text">
+           .-;+$XHHHHHHX$+;-.
+        ,;X@@X%/;=----=:/%X@@X/,
+      =$@@%=.              .=+H@X:
+    -XMX:                      =XMX=
+   /@@:                          =H@+
+  %@X,                            .$@$
+ +@X.                               $@%
+-@@,                                .@@=
+%@%                                  +@$
+H@:                                  :@H
+H@:         :HHHHHHHHHHHHHHHHHHX,    =@H
+%@%         ;@M@@@@@@@@@@@@@@@@@H-   +@$
+=@@,        :@@@@@@@@@@@@@@@@@@@@@= .@@:
+ +@X        :@@@@@@@@@@@@@@@M@@@@@@:%@%
+  $@$,      ;@@@@@@@@@@@@@@@@@M@@@@@@$.
+   +@@HHHHHHH@@@@@@@@@@@@@@@@@@@@@@@+
+    =X@@@@@@@@@@@@@@@@@@@@@@@@@@@@X=
+      :$@@@@@@@@@@@@@@@@@@@M@@@@$:
+        ,;$@@@@@@@@@@@@@@@@@@X/-
+           .-;+$XXHHHHHX$+;-.
+</div>
+<div id="ascii-broken-heart" class="ascii-text">
+                          .,---.
+                        ,/XM#MMMX;,
+                      -%##########M%,
+                     -@######%  $###@=
+      .,--,         -H#######$   $###M:
+   ,;$M###MMX;     .;##########$;HM###X=
+ ,/@##########H=      ;################+
+-+#############M/,      %##############+
+%M###############=      /##############:
+H################      .M#############;.
+@###############M      ,@###########M:.
+X################,      -$=X#######@:
+/@##################%-     +######$-
+.;##################X     .X#####+,
+ .;H################/     -X####+.
+   ,;X##############,       .MM/
+      ,:+$H@M#######M#$-    .$$=
+           .,-=;+$@###X:    ;/=.
+                  .,/X$;   .::,
+                      .,    ..
+</div>
+<div id="ascii-check" class="ascii-text">
+                                     :X-
+                                  :X###
+                                ;@####@
+                              ;M######X
+                            -@########$
+                          .$##########@
+                         =M############-
+                        +##############$
+                      .H############$=.
+         ,/:         ,M##########M;.
+      -+@###;       =##########M;
+   =%M#######;     :#########M/
+-$M###########;   :#########/
+ ,;X###########; =########$.
+     ;H#########+#######M=
+       ,+##############+
+          /M#########@-
+            ;M######%
+              +####:
+               ,$M-
+</div>
+
+<div id="ascii-fire" class="ascii-text">
+                     -$-
+                    .H##H,
+                   +######+
+                .+#########H.
+              -$############@.
+            =H###############@  -X:
+          .$##################:  @#@-
+     ,;  .M###################;  H###;
+   ;@#:  @###################@  ,#####:
+ -M###.  M#################@.  ;######H
+ M####-  +###############$   =@#######X
+ H####$   -M###########+   :#########M,
+  /####X-   =########%   :M########@/.
+    ,;%H@X;   .$###X   :##MM@%+;:-
+                 ..
+  -/;:-,.              ,,-==+M########H
+ -##################@HX%%+%%$%%%+:,,
+    .-/H%%%+%%$H@###############M@+=:/+:
+/XHX%:#####MH%=    ,---:;;;;/%%XHM,:###$
+$@#MX %+;-                           .
+</div>
+<div id="ascii-glados" class="ascii-text">
+       #+ @      # #              M#@
+ .    .X  X.%##@;# #   +@#######X. @#%
+   ,==.   ,######M+  -#####%M####M-    #
+  :H##M%:=##+ .M##M,;#####/+#######% ,M#
+ .M########=  =@#@.=#####M=M#######=  X#
+ :@@MMM##M.  -##M.,#######M#######. =  M
+             @##..###:.    .H####. @@ X,
+   ############: ###,/####;  /##= @#. M
+           ,M## ;##,@#M;/M#M  @# X#% X#
+.%=   ######M## ##.M#:   ./#M ,M #M ,#$
+##/         $## #+;#: #### ;#/ M M- @# :
+#+ #M@MM###M-;M #:$#-##$H# .#X @ + $#. #
+      ######/.: #%=# M#:MM./#.-#  @#: H#
++,.=   @###: /@ %#,@  ##@X #,-#@.##% .@#
+#####+;/##/ @##  @#,+       /#M    . X,
+   ;###M#@ M###H .#M-     ,##M  ;@@; ###
+   .M#M##H ;####X ,@#######M/ -M###$  -H
+    .M###%  X####H  .@@MM@;  ;@#M@
+      H#M    /@####/      ,++.  / ==-,
+               ,=/:, .+X@MMH@#H  #####$=
+</div>
+          
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="still-alive.js"></script>
+		
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-36533977-1']);
+		  _gaq.push(['_trackPageview']);
+		
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		
+		</script>		
+				
+	</body>
+
+</html>
