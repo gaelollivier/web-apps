@@ -281,7 +281,13 @@
 	}
 	    
 	// Initialisation
-	$(function(){		
+	$(function(){	
+		var dragging = false,
+            playAfterDragging = false,
+            progressElement = $('#progress'),
+            autoPlayStarted = false;
+
+		
 		// Load the song text
 		lyricsText = parseText($('#lyrics-text').text());
 		creditsText = parseText($('#credits-text').text());
@@ -296,9 +302,6 @@
 		// Events
 		playButton.click(stillAlive.togglePlay);
 		$(document).keydown(stillAlive.togglePlay);
-        var dragging = false,
-            playAfterDragging = false,
-            progressElement = $('#progress');
 		progressElement.mousedown(function(e) {
 			// Click position relative to bar
 			var pos = e.clientX - progressBar.offset().left,
@@ -324,16 +327,33 @@
     		}
 		});
 		
-		// Load the song	    
-		audioElement.addEventListener('canplay', function() {
+		// Set time to 0 (render a first time)
+		stillAlive.setTime(0);
+		
+		// Load the song
+		audioElement.addEventListener('loadeddata', function() {
 			// Check the URL for seeking time
 			if (window.location.search.indexOf('?') !== -1) {
 				stillAlive.setTime(parseFloat(window.location.search.substr(1)));
 			}
+			
+			if (autoPlayStarted) {
+				return ;
+			}
 				
 			// Song is ready, let's play !
 			stillAlive.play();
+			autoPlayStarted = true;
 		}, true);
+		
+		// If the loaded data doesn't fire, launch the song after 2s
+		// (and hope the song will be ready on time !
+		setTimeout(function() {
+			if (!autoPlayStarted) {
+				stillAlive.play();
+				autoPlayStarted = true;
+			}
+		}, 2000);
 	});
 	    
 }());
