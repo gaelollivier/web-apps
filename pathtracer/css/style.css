@@ -19,6 +19,15 @@ h1 {
 	margin: auto;	
 }
 
+/* Hide controls before jQuery UI load */
+.accordion {
+	display: none;
+}
+
+.ui-widget {
+	display: block;
+}
+
 #canvas-view {
 	float: left;
 	border: 3px solid white;
@@ -64,14 +73,14 @@ input {
 	margin-top: 5px;	
 }
 
-.slider {
+.ui-slider {
 	float: left;
 	width: 100%;
 	margin-top: 5px;
 	margin-bottom: 10px;
 }
 
-#render-lights-switch {
+.ui-buttonset {
 	float: left;
 	width: 100%;
 	margin-top: 5px;

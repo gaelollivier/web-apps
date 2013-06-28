@@ -2,20 +2,21 @@
 var renderer;
 var scene;
 
-$(function(){
+(function() {
 
 	renderer = new Renderer();
 	$('#canvas-view').html(renderer.canvas);	
 	
 	renderer.setSize([800, 450]);
 	
-	scene = testScene();
-	//scene = cornelBox();
+	scene = new Scene();
+	
 	scene.setMaxPathLength(3);
-	//scene.renderLights = true;
 	
 	// Add a flycam
 	scene.setCamera(new Flycam(renderer, [0, 3, 10], [16, 9], [0, 1, 0]));
+	
+	testScene(scene);
 	
 	renderer.setScene(scene);
 	renderer.update();
@@ -50,9 +51,7 @@ $(function(){
     loop();
     
     // Scenes
-    function testScene() {
-	    scene = new Scene();
-		
+    function testScene(scene) {		
 		scene.setRenderLights(false);
 		scene.setBackgroundColor([1, 1, 1]);
 		
@@ -68,12 +67,11 @@ $(function(){
 		scene.addObject(new Plane([0, 0, 0], [0, 1, 0], planeMaterial));
 			
 		scene.addLight(new Light([5, 5, 0], 1, colorFromHex(0xffffff)));
-	
+			
 		return scene;	
     }
     
-	function cornelBox() {
-		scene = new Scene();
+	function cornelBox(scene) {
 		
 		scene.setRenderLights(false);
 		
@@ -97,4 +95,4 @@ $(function(){
 		
 		return scene;
 	}    
-});
+}());

@@ -52,7 +52,7 @@ var Flycam = function(renderer, position, size, upVector) {
 		    renderer.reset();
 		    
 		    // Update controls
-		    Controls.populateValues('camera');
+		    Controls.populateValues();
 	    }
     });
 	
@@ -181,7 +181,7 @@ Flycam.prototype.update = function() {
 		hasMoved = true;
 		
 		// Update controls
-		Controls.populateValues('camera');
+		Controls.populateValues();
 	}
 	
 	return hasMoved;

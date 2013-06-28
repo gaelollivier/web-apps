@@ -1,70 +1,49 @@
-<html>
-
+<html ng-app="pathtracer">
 	<head>
 		<title>Pathtracer</title>
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 		
 		<!-- Styles -->
 		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/dark-hive/jquery-ui.css">
 		
-		<!-- jQuery UI -->
-		<link rel="stylesheet" href="css/dark-hive/jquery.ui.min.css">
-		<script type="text/javascript" src="js/lib/jquery.min.js"></script>
-		<script src="js/lib/jquery-ui.min.js"></script>
-		
-		<!-- Color Picker -->
-		<script type="text/javascript" src="js/lib/farbtastic.js"></script>
-		<link rel="stylesheet" href="css/farbtastic.css" type="text/css" />
-				
-		<script type="text/javascript" src="js/lib/stats.min.js"></script>		
-		<script type="text/javascript" src="js/lib/gl-matrix-min.js"></script>
-		
-		<!-- Pathtracer -->
-		<script type="text/javascript" src="js/Utilities.js"></script>		
-		<script type="text/javascript" src="js/Scene.js"></script>
-		<script type="text/javascript" src="js/Renderer.js"></script>
-		<script type="text/javascript" src="js/Raytracing.js"></script>
-		<script type="text/javascript" src="js/Flycam.js"></script>
-		<script type="text/javascript" src="js/Pathtracer.js"></script>
-		<script type="text/javascript" src="js/Controls.js"></script>
-		
+		<link rel="stylesheet" href="css/style.css">				
 	</head>
-	<body>
+	<body ng-controller="PathtracerController">
 		<section class="title">
 			<h1>WebGL Real-time pathtracer</h1>
 		</section>
 		<section id="content">
-			<div id="canvas-view"></div>
+			<div id="canvas-view" pt-no-select></div>
 		    
 			<section id="controls">
-			    <div class="accordion">
+			    <div class="accordion" pt-accordion="1">
 			    	<h3>Scene</h3>
 					<div>
-						<label for="bg-color">Background color:</label>
-						<div id="bg-colorpicker" class="colorpicker"></div>				
-						<label for="exposure">Exposure:</label>
-						<div id="exposure" class="slider"></div>
-						<label for="exposure">Max paths length:</label>
-						<div id="max-path-length" class="slider"></div>
+						<label>Background color:</label>
+						<div class="colorpicker" pt-color-picker="scene.backgroundColor"></div>
+						<label>Exposure:</label>
+						<pt-slider value="scene.exposure" min="0" max="10" step="0.1"></pt-slider>
+						<label>Max paths length:</label>
+						<pt-slider value="scene.maxPathLength" min="1" max="8" step="1"></pt-slider>
 						<span class="label">Render Lights:</span>
-						<div id="render-lights-switch">
-							<input type="radio" name="render-lights" id="render-lights-enabled" value="enabled" /><label for="render-lights-enabled">Enabled</label>
-							<input type="radio" name="render-lights" id="render-lights-disabled" value="disabled" /><label for="render-lights-disabled">Disabled</label>
-						</div>
+						<pt-switch value="scene.renderLights">
+							<input type="radio" value="enabled" /><label>Enabled</label>
+							<input type="radio" value="disabled" /><label>Disabled</label>
+						</pt-switch>
 					</div>
 					<h3>Camera</h3>
 					<div>
 						<span class="label">Position:</span>
-						<div id="camera-position" class="vec3"></div>
+						<pt-vec3 value="scene.camera.position"></pt-vec3>
 						<span class="label">Target:</span>
-						<div id="camera-target" class="vec3"></div>
-						<label for="camera-fov">Field of view:</label>
-						<div id="camera-fov" class="slider"></div>						
-						<label for="camera-aperture">Aperture:</label>
-						<div id="camera-aperture" class="slider"></div>
+						<pt-vec3 value="scene.camera.target"></pt-vec3>
+						<label>Field of view:</label>
+						<pt-slider value="scene.camera.fovy" min="1" max="179" step="1"></pt-slider>
+						<label>Aperture:</label>
+						<pt-slider value="scene.camera.aperture" min="0" max="1" step="0.01"></pt-slider>
 						<label for="camera-focus">Focus distance:</label>
-						<input type="number" id="camera-focus" step="0.1" />
+						<pt-float value="scene.camera.focusDistance" step="0.1"></pt-float>
 					</div>										
 					<h3>Materials</h3>
 					<div>
@@ -73,7 +52,7 @@
 						        {{material.name}}
 						    </li>
 						</ul>
-                        <button id="new-material">New material</button>
+                        <button pt-button>New material</button>
 					</div>
 					<h3>Objects</h3>
 					<div>
@@ -221,11 +200,11 @@
 			
 			// Return a view ray of the camera
 			// From http://schabby.de/picking-opengl-ray-tracing/
-			Ray getCameraRay(in vec2 point) {	
+			Ray getCameraRay(in vec2 point) {
 				Ray cameraRay;
 				
 				// Randomize pixel point for antialiasing
-				point += vec2(random(vec3(0.123, 0.4242, 0.8448), time), random(vec3(0.4578, 0.139, 0.692), time)) / viewport.xy;
+				point += uniformlyRandomDirection(time + dot(point,point)).xy / viewport.xy;
 				
 				vec3 view = normalize(camera.target - camera.position);
 				vec3 h = normalize(cross(view, camera.upVector));
@@ -249,7 +228,11 @@
 				if (camera.aperture > 0.0) {
 					// Add depth of fielf :)
 					vec3 focusPoint = camera.position + dir * camera.focusDistance;
+					// The first version if false because if moves the origin point on 3d space
 					cameraRay.origin = cameraRay.origin + uniformlyRandomDirection(time + dot(point,point)) * camera.aperture;
+					// This version should be right but behaves strangely...
+					//cameraRay.origin += (v/vLength * random(vec3(0.9898, 0.654, 0.2343), time + dot(point, point)) * 2.0 - 1.0) * camera.aperture
+					//				  + (h/hLength * random(vec3(0.724, 0.125, 0.571), time + dot(point, point)) * 2.0 - 1.0) * camera.aperture;
 					cameraRay.direction = normalize(focusPoint - cameraRay.origin);
 				}
 								
@@ -455,5 +438,27 @@
 				gl_FragColor = vec4(mix(finalColor, texture2D(texture, textureCoord).rgb, sampleWeight), 1.0);
 			}
 		</script>
+		
+		<!-- Core JS -->		
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>		
+		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+		
+		<!-- Color Picker -->
+		<script type="text/javascript" src="js/lib/farbtastic.js"></script>
+		<link rel="stylesheet" href="css/farbtastic.css" type="text/css" />
+				
+		<script type="text/javascript" src="js/lib/stats.min.js"></script>		
+		<script type="text/javascript" src="js/lib/gl-matrix-min.js"></script>
+		
+		<!-- Pathtracer -->
+		<script type="text/javascript" src="js/Utilities.js"></script>		
+		<script type="text/javascript" src="js/Scene.js"></script>
+		<script type="text/javascript" src="js/Renderer.js"></script>
+		<script type="text/javascript" src="js/Raytracing.js"></script>
+		<script type="text/javascript" src="js/Flycam.js"></script>
+		<script type="text/javascript" src="js/Pathtracer.js"></script>
+		<script type="text/javascript" src="js/Controls.js"></script>
+		
     </body>
 </html>
