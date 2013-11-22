@@ -67,7 +67,7 @@ Renderer.prototype.init = function() {
         
 		// Create two textures for rendering
         this.renderTextures = [];
-        var type = this.gl.getExtension('OES_texture_float') ? this.gl.FLOAT : this.gl.UNSIGNED_BYTE;
+        var type = this.gl.getExtension('OES_half_float_linear') ? this.gl.FLOAT : this.gl.UNSIGNED_BYTE;
         for (var i = 0; i < 2; ++i) {
 	        this.renderTextures.push(this.gl.createTexture());
 	        this.gl.bindTexture(this.gl.TEXTURE_2D, this.renderTextures[i]);

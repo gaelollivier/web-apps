@@ -16,7 +16,8 @@ var scene;
 	// Add a flycam
 	scene.setCamera(new Flycam(renderer, [0, 3, 10], [16, 9], [0, 1, 0]));
 	
-	testScene(scene);
+	//testScene(scene);
+	cornelBox(scene);
 	
 	renderer.setScene(scene);
 	renderer.update();

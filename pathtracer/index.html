@@ -70,6 +70,8 @@
     	
     	<!-- Shaders -->
 		<script id="vertex-shader" type="x-shader/x-vertex">
+		    precision mediump float;
+		    
 			attribute vec3	vertexPosition;
 			varying vec2	textureCoord;
 			uniform vec4	viewport;
@@ -440,7 +442,7 @@
 		</script>
 		
 		<!-- Core JS -->		
-		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>		
 		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 		
